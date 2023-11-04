@@ -1,0 +1,12 @@
+{
+  "name" : "ex01-01",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "9f03078bdcbab3ad8c1e3927c40c3fb48e42501f",
+  "dependencies" : [ {
+    "name" : "pthread",
+    "version>=" : "3.0.0#2"
+  }, {
+    "name" : "pthreads",
+    "version>=" : "3.0.0#14"
+  } ]
+}

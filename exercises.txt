@@ -1,0 +1,73 @@
+Ex0
+
+0.1:
+Folder ex0/0.1, build & run using CMake. Requires Pthreads to be found. I used Vcpkg to install a Windows port of pthreads.
+    Code can be found in 0.1/main.cpp
+
+0.2:
+Folder ex0/0.2, build & run using CMake. Requires Pthreads to be found. I used Vcpkg to install a Windows port of pthreads
+    Code can be found in 0.1/norm.cpp. I also added my own profiling utility in scope_profile.h.
+
+Ex1
+
+I decided to re-write the entire implementation. Instead I used C++ and <thread>, <complex>, among some other libraries to achieve the same results.
+The code is in ex1/jobified/jobmandel.cpp, and to run it, use CMake.
+I used a job system (WickedEngine heavy-duty job system) for load balancing, and depending on 'group size' (how many jobs to execute per thread).
+Jobs inside a group execute serially. It is usually worth increasing for small jobs. In this case, a "job" will be calculating one single pixel value for a given coordinate.
+
+Technically, the 3 interesting scenarios are when groupSize = width * height (only 1 thread will thus run the job), which is
+equal to the sequential case.
+
+The other interesting case is when groupSize = width * height / amount_of_threads, which will split the work to be done into
+amount_of_threads chunks. This will not be load-balanced, and will equate to the "naive implementation".
+
+[#Threads --> Exec. time] when naive split implementation:
+Threads = 1 --> 315 ms
+Threads = 2 --> 165 ms
+Threads = 4 --> 147 ms
+Threads = 8 --> 106 ms
+Threads = 16 --> 61 ms
+Threads = 32 --> 33 ms
+
+The load-balanced way, is to have groupSize = width (or some other constant, but that is significantly lower than for the naive implementation)
+This way, we will have 'width' amount of jobs, spread across amount_of_threads amount of threads. For example, in a 1024^2 image, with 32 threads,
+it will be 1024 jobs split on 32 threads, where each job will work on 1024 pixels (one row or column).
+
+As expected, the results are as follows:
+(1024^2 image, 32 threads)
+Generating mandelbrot set, sequential : 308 (milliseconds)
+Generating mandelbrot set, split equally among threads : 33 (milliseconds)
+Generating mandelbrot set, balanced among jobs : 13 (milliseconds)
+
+[#WorkerThreads --> Exec. time] when load-balanced:
+Threads = 1 --> 162 ms (note how this is half exec. time of naive split, how can this be? **)
+Threads = 2 --> 113 ms
+Threads = 4 --> 83 ms
+Threads = 8 --> 41 ms
+Threads = 16 --> 22 ms
+Threads = 32 --> 13 ms
+
+** --> This is because the main thread is waiting for the 1 worker thread, and while waiting, itself also becomes a worker (200 iq move there).
+
+Why is load-balanced so much faster? Well, because we split the work into more fine-grained chunks, and most processing time on those
+fine-grained small chunks will be fast (because it will break in the for loop early in many cases), and then it can continue to work on the
+next chunk immediately. Compared to the naive approach, which splits in amount_of_threads, and then waits for all of them to finish, but the problem
+is that the, for example, top-most chunk might have been finished really early, because there is not much processing needed, and then it just
+have to wait for the rest of the threads to get finished as well. In the load-balanced scenario, a thread is much more busy, and is not waiting
+for other threads to finish their execution, in the same way.
+
+
+Ex 0.3
+
+1.
+Multithreaded synchronization is required, since the threads will not finish their execution at the same time,
+they will have to wait for each other. In the norm scenario, all threads needs to find their partial sum first, and once
+all partial sums has been calculated, the last step is to sum all partial sums, and then do the square root to find the norm.
+
+In the mandelbrot set, yes, we still need synchronisation in order to know when the rendering of the image is finished.
+(Or not, maybe we want to display a partially rendered image, but it would probably look weird).
+
+2.
+
+Barrier implemented and can be turned on/off based on if USE_JOIN is defined or not. To enable it, USE_JOIN needs to be off.
+It gives similar results to just using pthread_join.
