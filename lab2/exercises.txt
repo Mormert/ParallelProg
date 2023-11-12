@@ -1,0 +1,46 @@
+Warm Up / Intro
+
+In the fork-join mechanism, one needs to create threads, pass over args, run threads, wait and join, etc. In the OpenMP
+it's very easy with just the #pragma omp parallel, that seem to be the equivalent. Management of memory, at first glance,
+seems to be easier. Maybe passing arguments will be easier too.
+
+Exercise 1 / Norm
+
+False sharing is when 2+ threads access data on the same cache line, thus causing cache sync issues. It's called false
+because the threads don't data-race, but access data that is close to each other, and in the same cache line. It can
+be solved by padding, for example in an array of structs, each struct should be more than a cache line in size, if
+several threads access neighbouring structs in memory concurrently.
+
+When updating a global counter variable, the omp atomic is the most appropriate.
+
+We need to use "#pragma omp parallel for", or first "#pragma omp parallel" and then #pragma omp for, but it's easier to just
+have it bunched into one line, which does both things. A statement block after #pragma omp parallel will run in parallel, while
+"#pragma omp for" should be used to parallelize a for-loop. If it's just a for-loop that needs parallelization, "#pragma omp parallel for"
+comes in handy.
+
+Reduction is used to calculate on a local variable in the parallel for loop and then combine in with the "global" variable, using a
+specified operator (thread safely). Can be used to find sum, product, min/max, average, etc in an array.
+Reduction is very clean since we don't have to write as much code, for example with an outer variable protected by a concept like atomic.
+
+
+Exercise with Mandel.c
+The parallel for can also be provided some extra details, like what variables are shared, and what should be thread-local/private.
+The alternative for the atomic flag for the numoutside is the critical flag, but atomic makes more sense for a counter like this.
+
+
+Exercise with mandelbrot image
+I used the #pragma parallel for with also static and dynamic scheduling, with 1024 as chunk size, and it came very close to the
+jobified version I used earlier, in the dynamic scheduling. The chunk size says how many iterations should one thread work in serial
+before moving on to the next "work to be done" in the queue.
+
+Implicit/Explicit barriers:
+Implicit barriers are added by default by OpenMP as a safety measure after parallel loops. They can be disabled by using the
+nowait keyword. Explicit barriers are added by the programmer with the 'barrier' keyword. In my mandelbrot image generation program,
+implicit barriers are added after the for loops that write each pixel value in the output image.
+The master keyword is used when a specific sub-section of a parallel section should only run on thread 0 (master thread).
+The single keyword is used to have the first thread that reach the single section run that code, and have
+other threads wait for that single thread to finish its work, until they continue.
+The section/sections is used to have threads run different code inside a parallel section, instead of having them all
+run the same code, like the SPMD pattern.
+
+

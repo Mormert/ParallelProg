@@ -7,6 +7,8 @@
 
 #include "WickedEngine/wiJobSystem.h"
 
+#include <omp.h>
+
 constexpr int cWidth = 1024;
 constexpr int cHeight = 1024;
 constexpr int cWidthHeight = cWidth * cHeight;
@@ -56,6 +58,7 @@ int main() {
 
     const int threadAmount = 32;
     wi::jobsystem::Initialize(threadAmount);
+    omp_set_num_threads(threadAmount);
 
     auto img = std::make_unique<image>();
 
@@ -73,7 +76,7 @@ int main() {
         SCOPED_PROFILE_LOG("Generating mandelbrot set, split equally among threads")
 
         const int groupSize = cWidthHeight / threadAmount;
-        mandelbrot_image(img, groupSize);
+        mandelbrot_image_job(img, groupSize);
     }
 
     {
@@ -81,7 +84,31 @@ int main() {
         SCOPED_PROFILE_LOG("Generating mandelbrot set, balanced among jobs")
 
         const int groupSize = cWidth;
-        mandelbrot_image(img, groupSize);
+        mandelbrot_image_job(img, groupSize);
+    }
+
+    {
+        SCOPED_PROFILE_LOG("Generating mandelbrot set, OpenMP parallel for")
+#pragma omp parallel for
+        for (int i = 0; i < cWidth * cHeight; i++) {
+            img->at(i) = mandelbrot_pixel(i % cWidth, i / cWidth);
+        }
+    }
+
+    {
+        SCOPED_PROFILE_LOG("Generating mandelbrot set, OpenMP parallel for static 1024")
+#pragma omp parallel for schedule(static, 1024)
+        for (int i = 0; i < cWidth * cHeight; i++) {
+            img->at(i) = mandelbrot_pixel(i % cWidth, i / cWidth);
+        }
+    }
+
+    {
+        SCOPED_PROFILE_LOG("Generating mandelbrot set, OpenMP parallel for dynamic 1024")
+#pragma omp parallel for schedule(dynamic, 1024)
+        for (int i = 0; i < cWidth * cHeight; i++) {
+            img->at(i) = mandelbrot_pixel(i % cWidth, i / cWidth);
+        }
     }
 
     stbi_write_png("mandelbrot.png", cWidth, cHeight, cImageChannels, img->data(), cWidth * cImageChannels);
