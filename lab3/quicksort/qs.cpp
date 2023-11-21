@@ -187,7 +187,7 @@ void quicksortFullyParallelRecursive(int *arr, int left, int right) {
 }
 
 void quicksortFullyParallel(int *arr, int len) {
-#pragma omp parallel num_threads(omp_get_num_procs())
+#pragma omp parallel
     {
 #pragma omp single nowait
         {
@@ -264,7 +264,7 @@ int main() {
         }
     };
 
-    const auto testQuicksortFullyParallel = [&](size_t size) -> void {
+    const auto  testQuicksortFullyParallel = [&](size_t size) -> void {
         auto testVector = generateRandomNumbers(size);
         {
             SCOPED_PROFILE_LOG("FULLY PARALLEL")
@@ -290,7 +290,7 @@ int main() {
         }
     };
 
-    for (int i = 3; i < 9; i++) {
+    for (int i = 0; i < 8; i++) {
         auto sz = std::pow(10, i);
         testStdSort(sz);
         testStdParallelSort(sz);

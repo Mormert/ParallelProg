@@ -34,7 +34,7 @@ public:
 
 private:
     std::string_view _message;
-    uint64_t _start;
+    std::chrono::time_point<std::chrono::steady_clock> _start;
 };
 
 #define SCOPED_PROFILE_LOG(message) auto scopedLog = ScopeProfileLog(message);

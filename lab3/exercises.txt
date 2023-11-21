@@ -1,0 +1,58 @@
+
+1, 2, 3, 4:
+
+Both exercises can be run using CMake, see CMakeLists.txt's in /norm and /quicksort.
+
+The Norm in recursive parallel divide & conquer implementation:
+The execution time is roughly twice as long as the parallel "divide into X groups" like we did in lab1/2, but, it
+proves how you can implement a divide & conquer algorithm, and make it run in parallel.
+
+
+The quicksort:
+
+the isSorted function, is provided by the C++ standard library's std::is_sorted().
+
+My quicksort impl. uses the leftmost element in a group as the pivot. I tried others, like "median of three",
+taking the leftmost, rightmost and the middle, and then using the pivot as the median of those.
+
+Here is the output of sorting an array with 100000000 elements:
+
+---------
+
+STD::SORT : 3812 (milliseconds)             (the C++ standard library sort function)
+Vector with 100000000 elements is sorted.
+
+STD::SORT PARALLEL : 733 (milliseconds)     (the C++ standard library parallel sort function)
+Vector with 100000000 elements is sorted.
+
+SEQUENTIAL : 4210 (milliseconds)            (sequential quicksort implementation by me)
+Vector with 100000000 elements is sorted.
+
+PARALLEL : 3061 (milliseconds)              (simple parallel quicksort implementation by me)
+Vector with 100000000 elements is sorted.
+
+FULLY PARALLEL : 773 (milliseconds)         (full parallel quicksort with parallel partition, impl. by me)
+Vector with 100000000 elements is sorted.
+
+QS JOB : 1086 (milliseconds)                (full parallel quicksort with par. partition, using job system, impl by me)
+Vector with 100000000 elements is sorted.
+
+----------
+
+From the numbers above, we can see that my fully parallel QS algorithm is comparable to the C++ standard's parallel sort function.
+We can also see that my sequential QS is comparable to the standard's sequential sort as well.
+
+5:
+The plots of algorithm complexity is provided in separate PNG files in this folder.
+S = sequential algorithm.
+PX = simple parallel with X threads.
+FPX = fully parallel with X threads.
+
+The PX does not really get better if more threads are added, and is still just slightly faster than sequential.
+The FPX gets significantly better when double the threads are added, this is because the depth in the recursion can
+get one depth deeper, when the #threads double.
+Notice that for small input, the sequential and simple parallel are almost equal, but the fully parallel is very slow
+(probably due to threading overhead). This overhead is much less noticeable as the input data grows, as can be seen in the plot.
+In fact, as we can see in the plot, the more threads we use in fully parallel for small data, the slower it is.
+First when the #input data > 10^3, the fully parallel is faster than the sequential.
+First when the #input data > 10^4, the fully parallel is faster than simple parallel.

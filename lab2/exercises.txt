@@ -1,3 +1,5 @@
+The exercises can be run using CMake, see CMakeLists.txt's in /intro, /mandel, /mandelbrot and /norm.
+
 Warm Up / Intro
 
 In the fork-join mechanism, one needs to create threads, pass over args, run threads, wait and join, etc. In the OpenMP
