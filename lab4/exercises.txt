@@ -1,4 +1,6 @@
 
+Run the different programs with CMake. It's written in C++17 / CUDA 17.
+
 The performance tests for ex3, running on my GeForce RTX 3080 and AMD Ryzen 9 5950 X.
 
 Note: -*CPU/GPU-TOTAL-* means the total time for the matrix multiplication, including mem-copy over to GPU and back, etc.
