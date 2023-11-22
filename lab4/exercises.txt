@@ -161,4 +161,18 @@ I measured the time on 1024^2 matrix with 1024 block size, and the difference wa
 thread identifiers. Maybe the GPU architecture is not significant.
 
 
+Ex5:
+Best times:
+With TILE_WIDTH = 8: 317 microseconds
+With TILE_WIDTH = 16: 287 microseconds
+With TILE_WIDTH = 32: 294 microseconds
 
+No significant difference in different tile sizes.
+
+The best time for non-tiled was 327 microseconds.
+
+No significant difference here either.
+
+This non-significant difference that we see, might be because small matrix size.
+The problem I had was when I increased the matrix size, the resulting matrix was wrongly
+computed for some odd reason. 256^2 matrices works, though, and with tile sizes of {8, 16, 32}.
