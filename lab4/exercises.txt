@@ -1,0 +1,164 @@
+
+The performance tests for ex3, running on my GeForce RTX 3080 and AMD Ryzen 9 5950 X.
+
+Note: -*CPU/GPU-TOTAL-* means the total time for the matrix multiplication, including mem-copy over to GPU and back, etc.
+
+BlockSize 16:
+**GPU-2^2 :           51.2 (microseconds)
+-*CPU/GPU-TOTAL-2^2 : 413 (microseconds)
+BlockSize 64:
+**GPU-2^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-2^2 : 166 (microseconds)
+BlockSize 256:
+**GPU-2^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-2^2 : 153 (microseconds)
+BlockSize 1024:
+**GPU-2^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-2^2 : 149 (microseconds)
+
+--Only CPU-2^2       : 0 (microseconds)
+
+BlockSize 16:
+**GPU-4^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-4^2 : 156 (microseconds)
+BlockSize 64:
+**GPU-4^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-4^2 : 130 (microseconds)
+BlockSize 256:
+**GPU-4^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-4^2 : 149 (microseconds)
+BlockSize 1024:
+**GPU-4^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-4^2 : 132 (microseconds)
+
+--Only CPU-4^2       : 0 (microseconds)
+
+BlockSize 16:
+**GPU-8^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-8^2 : 160 (microseconds)
+BlockSize 64:
+**GPU-8^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-8^2 : 148 (microseconds)
+BlockSize 256:
+**GPU-8^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-8^2 : 143 (microseconds)
+BlockSize 1024:
+**GPU-8^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-8^2 : 143 (microseconds)
+
+--Only CPU-8^2       : 0 (microseconds)
+
+BlockSize 16:
+**GPU-16^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-16^2 : 151 (microseconds)
+BlockSize 64:
+**GPU-16^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-16^2 : 143 (microseconds)
+BlockSize 256:
+**GPU-16^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-16^2 : 144 (microseconds)
+BlockSize 1024:
+**GPU-16^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-16^2 : 144 (microseconds)
+
+--Only CPU-16^2       : 0 (microseconds)
+
+BlockSize 16:
+**GPU-32^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-32^2 : 167 (microseconds)
+BlockSize 64:
+**GPU-32^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-32^2 : 145 (microseconds)
+BlockSize 256:
+**GPU-32^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-32^2 : 145 (microseconds)
+BlockSize 1024:
+**GPU-32^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-32^2 : 144 (microseconds)
+
+--Only CPU-32^2       : 0 (microseconds)
+
+BlockSize 16:
+**GPU-64^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-64^2 : 155 (microseconds)
+BlockSize 64:
+**GPU-64^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-64^2 : 208 (microseconds)
+BlockSize 256:
+**GPU-64^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-64^2 : 204 (microseconds)
+BlockSize 1024:
+**GPU-64^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-64^2 : 287 (microseconds)
+
+--Only CPU-64^2       : 1 (microseconds)
+
+BlockSize 16:
+**GPU-128^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-128^2 : 232 (microseconds)
+BlockSize 64:
+**GPU-128^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-128^2 : 160 (microseconds)
+BlockSize 256:
+**GPU-128^2 :           4.096 (microseconds)
+-*CPU/GPU-TOTAL-128^2 : 151 (microseconds)
+BlockSize 1024:
+**GPU-128^2 :           5.12 (microseconds)
+-*CPU/GPU-TOTAL-128^2 : 150 (microseconds)
+
+--Only CPU-128^2       : 4 (microseconds)
+
+BlockSize 16:
+**GPU-256^2 :           34.4 (microseconds)
+-*CPU/GPU-TOTAL-256^2 : 195 (microseconds)
+BlockSize 64:
+**GPU-256^2 :           33.696 (microseconds)
+-*CPU/GPU-TOTAL-256^2 : 196 (microseconds)
+BlockSize 256:
+**GPU-256^2 :           31.68 (microseconds)
+-*CPU/GPU-TOTAL-256^2 : 186 (microseconds)
+BlockSize 1024:
+**GPU-256^2 :           33.504 (microseconds)
+-*CPU/GPU-TOTAL-256^2 : 192 (microseconds)
+
+--Only CPU-256^2       : 15 (microseconds)
+
+BlockSize 16:
+**GPU-512^2 :           43.36 (microseconds)
+-*CPU/GPU-TOTAL-512^2 : 225 (microseconds)
+BlockSize 64:
+**GPU-512^2 :           35.392 (microseconds)
+-*CPU/GPU-TOTAL-512^2 : 207 (microseconds)
+BlockSize 256:
+**GPU-512^2 :           40.416 (microseconds)
+-*CPU/GPU-TOTAL-512^2 : 204 (microseconds)
+BlockSize 1024:
+**GPU-512^2 :           37.6 (microseconds)
+-*CPU/GPU-TOTAL-512^2 : 242 (microseconds)
+
+--Only CPU-512^2       : 78 (microseconds)
+
+BlockSize 16:
+**GPU-1024^2 :           161.248 (microseconds)
+-*CPU/GPU-TOTAL-1024^2 : 237 (microseconds)
+BlockSize 64:
+**GPU-1024^2 :           131.904 (microseconds)
+-*CPU/GPU-TOTAL-1024^2 : 207 (microseconds)
+BlockSize 256:
+**GPU-1024^2 :           129.056 (microseconds)
+-*CPU/GPU-TOTAL-1024^2 : 205 (microseconds)
+BlockSize 1024:
+**GPU-1024^2 :           135.392 (microseconds)
+-*CPU/GPU-TOTAL-1024^2 : 212 (microseconds)
+
+--Only CPU-1024^2       : 365 (microseconds)
+
+
+
+Ex4:
+
+I measured the time on 1024^2 matrix with 1024 block size, and the difference was not noticeable going from x to y in the
+thread identifiers. Maybe the GPU architecture is not significant.
+
+
+
