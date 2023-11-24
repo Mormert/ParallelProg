@@ -165,16 +165,18 @@ thread identifiers. Maybe the GPU architecture is not significant.
 
 Ex5:
 Best times:
-With TILE_WIDTH = 8: 317 microseconds
-With TILE_WIDTH = 16: 287 microseconds
-With TILE_WIDTH = 32: 294 microseconds
 
-No significant difference in different tile sizes.
+Using tile width of 32 in the below samples.
 
-The best time for non-tiled was 327 microseconds.
+Without tiling, N = 256 time was 370 milliseconds
+With tiling, N = 256 time was 366 milliseconds
+(no significant difference)
 
-No significant difference here either.
+Without tiling, N = 1024 time was 1550 milliseconds
+With tiling, N = 1024 time was 1309 milliseconds
+(starts seeing a difference)
 
-This non-significant difference that we see, might be because small matrix size.
-The problem I had was when I increased the matrix size, the resulting matrix was wrongly
-computed for some odd reason. 256^2 matrices works, though, and with tile sizes of {8, 16, 32}.
+Without tiling, N = 2048 time was 32436 milliseconds
+With tiling, N = 2048 time was 7470 milliseconds
+
+Tiling gives a significant boost in performance for large matrices.

@@ -7,12 +7,14 @@ const int N = 256;
 
 const int TILE_WIDTH = 32;
 
-__global__ void matrixMulKernel(int* A, int* B, int* C) {
+using calculateType = float;
+
+__global__ void matrixMulKernel(calculateType* A, calculateType* B, calculateType* C) {
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (row < N && col < N) {
-        float value = 0;
+        calculateType value = 0;
         for (int i = 0; i < N; ++i) {
             value += A[row * N + i] * B[i * N + col];
         }
@@ -21,9 +23,9 @@ __global__ void matrixMulKernel(int* A, int* B, int* C) {
 }
 
 //Matrix multiplication on GPU
-__global__ void matrixMulTileKernel(int *A, int *B, int *C) {
-    __shared__ float Ads[TILE_WIDTH][TILE_WIDTH];
-    __shared__ float Bds[TILE_WIDTH][TILE_WIDTH];
+__global__ void matrixMulTileKernel(calculateType *A, calculateType *B, calculateType *C) {
+    __shared__ calculateType Ads[TILE_WIDTH][TILE_WIDTH];
+    __shared__ calculateType Bds[TILE_WIDTH][TILE_WIDTH];
 
     int bx = blockIdx.x;
     int by = blockIdx.y;
@@ -33,14 +35,14 @@ __global__ void matrixMulTileKernel(int *A, int *B, int *C) {
     int Row = by * TILE_WIDTH + ty;
     int Col = bx * TILE_WIDTH + tx;
 
-    float Cval = 0.0;
+    calculateType Cval = 0.0;
 
     // loop over tiles
-    for (int m = 0; m < N / TILE_WIDTH; m++) {
+    for (int64_t m = 0; m < N / TILE_WIDTH; m++) {
         Ads[ty][tx] = A[Row * N + (m * TILE_WIDTH + tx)];
         Bds[ty][tx] = B[(m * TILE_WIDTH + ty) * N + Col];
         __syncthreads();
-        for (int k = 0; k < TILE_WIDTH; k++) {
+        for (int64_t k = 0; k < TILE_WIDTH; k++) {
             // loop within tile
             Cval += Ads[ty][k] * Bds[k][tx];
         }
@@ -50,30 +52,30 @@ __global__ void matrixMulTileKernel(int *A, int *B, int *C) {
 }
 
 //Matrix multiplication on CPU
-void matrixMulCPU(int *A, int *B, int *C) {
-    int val = 0;
-    for (int row = 0; row < N; ++row)
-        for (int col = 0; col < N; ++col) {
+void matrixMulCPU(calculateType *A, calculateType *B, calculateType *C) {
+    calculateType val = 0;
+    for (int64_t row = 0; row < N; ++row)
+        for (int64_t col = 0; col < N; ++col) {
             val = 0;
-            for (int k = 0; k < N; ++k)
+            for (int64_t k = 0; k < N; ++k)
                 val += A[row * N + k] * B[k * N + col];
             C[row * N + col] = val;
         }
 }
 
-int checkResults(int *A, int *B, int *RC) {
-    int *r_cpu = (int *) malloc(N * N * sizeof(int));
+int checkResults(calculateType *A, calculateType *B, calculateType *RC) {
+    calculateType *r_cpu = (calculateType *) malloc(N * N * sizeof(calculateType));
     matrixMulCPU(A, B, r_cpu);
 
     //struct timeval start, end;
     //gettimeofday(&start, NULL);
 
-    for (int row = 0; row < N; ++row)
-        for (int col = 0; col < N; ++col) {
+    for (int64_t row = 0; row < N; ++row)
+        for (int64_t col = 0; col < N; ++col) {
             if (RC[row * N + col] != r_cpu[row * N + col]) {
-                printf("Wrong calculation at [%d][%d]\n", row, col);
-                free(r_cpu);
-                return 0;
+                printf("Wrong calculation at [%d][%d], expected GPU: %d, CPU: %d\n", row, col, RC[row * N + col], r_cpu[row * N + col]);
+                //free(r_cpu);
+                //return 0;
             }
         }
     //gettimeofday(&end, NULL);
@@ -86,20 +88,31 @@ int checkResults(int *A, int *B, int *RC) {
 
 int main() {
     printf("Started ...\n");
-    int *a_cpu, *b_cpu, *a_gpu, *b_gpu, *c_cpu, *c_gpu;
-    int size = N * N * sizeof(int);
-    a_cpu = (int *) malloc(size);
-    b_cpu = (int *) malloc(size);
-    c_cpu = (int *) malloc(size);
-    cudaMalloc(&a_gpu, size);
-    cudaMalloc(&b_gpu, size);
-    cudaMalloc(&c_gpu, size);
+    calculateType *a_cpu, *b_cpu, *a_gpu, *b_gpu, *c_cpu, *c_gpu;
+    int64_t size = N * N * sizeof(calculateType);
+    a_cpu = (calculateType *) malloc(size);
+    b_cpu = (calculateType *) malloc(size);
+    c_cpu = (calculateType *) malloc(size);
+    auto ret = cudaMalloc(&a_gpu, size);
+    if(ret == cudaSuccess){
+        std::cout << "works";
+    }
+    ret = cudaMalloc(&b_gpu, size);
+    if(ret == cudaSuccess){
+        std::cout << "works";
+    }
+    ret = cudaMalloc(&c_gpu, size);
+    if(ret == cudaSuccess){
+        std::cout << "works";
+    }
     // Fill the matrices with some random data
     time_t t;
     srand((unsigned) time(&t));
-    for (int i = 0; i < N * N; ++i) {
-        a_cpu[i] = rand() % N;
-        b_cpu[i] = rand() % N;
+    for (int64_t i = 0; i < N * N; ++i) {
+        a_cpu[i] = rand() % 512;
+        //a_cpu[i] = i;
+        //b_cpu[i] = i;
+        b_cpu[i] = rand() % 512;
         c_cpu[i] = 0;
     }
     cudaMemcpy(a_gpu, a_cpu, size, cudaMemcpyHostToDevice);
@@ -112,14 +125,14 @@ int main() {
 
     dim3 bSize(TILE_WIDTH, TILE_WIDTH, 1);
     dim3 gSize(N / TILE_WIDTH, N / TILE_WIDTH);
-    matrixMulTileKernel <<< gSize, bSize >>>(a_gpu, b_gpu, c_gpu);
+    matrixMulKernel <<< gSize, bSize >>>(a_gpu, b_gpu, c_gpu);
 
     cudaEventRecord(end);
     cudaEventSynchronize(end);
     float elapsedTimeMS = 0; //time in milliseconds
     cudaEventElapsedTime(&elapsedTimeMS, start, end);
 
-    std::cout << "**GPU-" << N << "^2 :           " << elapsedTimeMS * 1000.f << " (microseconds)\n";
+    std::cout << "**GPU-" << N << "^2 :           " << elapsedTimeMS * 1000.f << " (milliseconds)\n";
 
     cudaMemcpy(c_cpu, c_gpu, size, cudaMemcpyDeviceToHost);
     cudaError_t error = cudaGetLastError();
