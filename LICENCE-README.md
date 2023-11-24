@@ -1,0 +1,1 @@
+The set of lab exercises used in this project is from a course at Örebro University. It contains solutions by Johan Lind, and is intended for grading purposes ONLY within the course, as a means of distributing the code to the examinator.
