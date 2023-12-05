@@ -115,7 +115,6 @@ __global__ void convolution(unsigned char *inputImageData, int *maskData, unsign
                 edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, 0, 2);
             }
 
-
         } else { //the thread in the blue region
             edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 0, 0);
         }
@@ -201,7 +200,7 @@ int main(int argc, char *argv[]) {
         }
         fread(hostMaskData, sizeof(int), maskRows * maskColumns, fp);
     } else {
-        hostInputImageData = readppm((char *) "lenna512.ppm", (int *) &imageWidth, (int *) &imageHeight);
+        hostInputImageData = readppm((char *) "joanne512.ppm", (int *) &imageWidth, (int *) &imageHeight);
 
         for (int i = 0; i < maskRows; i++)
             for (int j = 0; j < maskColumns; j++)
