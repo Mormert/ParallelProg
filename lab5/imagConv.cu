@@ -56,7 +56,6 @@ __device__ void
 edgePixelLoader(int row, int col, int imageWidth, int imageHeight, int channels, int channelIdx, unsigned char *inputImageData,
                 unsigned char MShared[][TWidth + 2 * Mask_radius], int xSh, int ySh,
                 int shiftX, int shiftY) {
-   // auto imageIdx = ((row + shiftY) * imageWidth + col + shiftX) * channels;
     auto imageIdx = ((row + shiftY) * imageWidth + col + shiftX) * channels + channelIdx;
 
     assignPixelValue(imageIdx, imageHeight, imageWidth, channels, inputImageData, MShared, xSh + shiftX, ySh + shiftY);
@@ -77,47 +76,70 @@ __global__ void convolution(unsigned char *inputImageData, int *maskData, unsign
     for (int channelIdx = 0; channelIdx < channels; channelIdx++) {
         // the threads in the green and red regions
         if (threadIdx.x == 0 || threadIdx.x == TWidth - 1 || threadIdx.y == 0 || threadIdx.y == TWidth - 1) {
+            if(threadIdx.y == 0)
+            {
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 0, 0);
 
-            if (threadIdx.x == 0 && threadIdx.y == 0) {
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 0, -1);
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 0, -2);
+            }
+
+            if(threadIdx.y == TWidth - 1)
+            {
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 0, 0);
+
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 0, 1);
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 0, 2);
+            }
+
+            if(threadIdx.x == 0)
+            {
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 0, 0);
+
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, -1, 0);
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, -2, 0);
+            }
+
+            if(threadIdx.x == TWidth - 1)
+            {
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 0, 0);
+
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 1, 0);
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 2, 0);
+            }
+
+            if(threadIdx.x == 0 && threadIdx.y == 0)
+            {
                 edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, -1, -1);
                 edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, -1, -2);
                 edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, -2, -1);
             }
-            if (threadIdx.x == 0) {
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, 0, 0);
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, -1, 0);
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, -2, 0);
-            }
-            if (threadIdx.y == 0) {
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, 0, 0);
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, 0, -1);
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, 0, -2);
+
+            if(threadIdx.x == TWidth - 1 && threadIdx.y == 0)
+            {
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, 1, -1);
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, 1, -2);
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, 2, -1);
             }
 
-            edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, -2, -2);
-            edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx,inputImageData, MShared, xSh, ySh, 2, -2);
-            edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, -2, 2);
-            edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx,inputImageData, MShared, xSh, ySh, 2, 2);
+            if(threadIdx.x == 0 && threadIdx.y == TWidth - 1)
+            {
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, -1, 1);
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, -1, 2);
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, -2, 1);
+            }
 
-            if (threadIdx.x == TWidth - 1 && threadIdx.y == TWidth - 1) {
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, 1, 1);
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, 1, 2);
+            if(threadIdx.x == TWidth - 1 && threadIdx.y == TWidth - 1)
+            {
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, 1, 1);
+                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, 1, 2);
                 edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, 2, 1);
-            }
-            if (threadIdx.x == TWidth - 1) {
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, 0, 0);
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, 1, 0);
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, 2, 0);
-            }
-            if (threadIdx.y == TWidth - 1) {
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, 0, 0);
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx,inputImageData, MShared, xSh, ySh, 0, 1);
-                edgePixelLoader(row, col, imageWidth, imageHeight, channels,channelIdx, inputImageData, MShared, xSh, ySh, 0, 2);
             }
 
         } else { //the thread in the blue region
             edgePixelLoader(row, col, imageWidth, imageHeight, channels, channelIdx, inputImageData, MShared, xSh, ySh, 0, 0);
         }
+
 
         // Wait until all the elements are read by the threads of the block into the shared memory
         __syncthreads();
@@ -131,8 +153,8 @@ __global__ void convolution(unsigned char *inputImageData, int *maskData, unsign
             }
         }
 
-        auto imageIdx = (row * imageWidth + col) * channels + channelIdx;
-        outputImageData[imageIdx] = accum / divideBy;
+        auto imageIdxx = (row * imageWidth + col) * channels + channelIdx;
+        outputImageData[imageIdxx] = accum / divideBy;
 
         // Wait until all the the threads are done with the calculations
         __syncthreads();

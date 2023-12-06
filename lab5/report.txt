@@ -1,0 +1,6 @@
+The way I solved it was to check if the current thread pixel is inside the blue area, or if it's on an edge, or a corner.
+There's 4 edges, and 4 corners and 1 "blue area" (from the graph given in the lab instructions) So that makes it one
+"default case" (the blue area) and 8 edge cases that needs to be handled.
+
+For easier code management I took the original provided tiling code, and made helper functions to easily organize everything.
+Without doing so it became hard to manage the code quite fast :)
